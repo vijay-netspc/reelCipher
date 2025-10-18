@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REEL_CIPHER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff41;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 255, 65, 0.03) 0px,
+                    transparent 1px,
+                    transparent 2px,
+                    rgba(0, 255, 65, 0.03) 3px
+                );
+            pointer-events: none;
+            animation: scan 8s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(20px); }
+        }
+
+        .container {
+            background: rgba(10, 10, 10, 0.95);
+            border: 2px solid #00ff41;
+            border-radius: 4px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3),
+                        inset 0 0 20px rgba(0, 255, 65, 0.05);
+            position: relative;
+            z-index: 1;
+        }
+
+        .glitch {
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            position: relative;
+            text-shadow: 
+                0 0 10px #00ff41,
+                0 0 20px #00ff41,
+                0 0 30px #00ff41;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 12px;
+            color: #00ff4180;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input {
+            width: 100%;
+            background: #000;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+            border-color: #00ff41;
+        }
+
+        input::placeholder {
+            color: #00ff4150;
+        }
+
+        button {
+            width: 100%;
+            background: #00ff41;
+            color: #0a0a0a;
+            border: none;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #0a0a0a;
+            color: #00ff41;
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+            padding: 13px;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .output-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #00ff4130;
+            display: none;
+        }
+
+        .output-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .output-box {
+            background: #000;
+            border: 1px solid #00ff41;
+            padding: 15px;
+            border-radius: 2px;
+            word-break: break-all;
+            font-size: 14px;
+            margin-top: 10px;
+            position: relative;
+            min-height: 50px;
+        }
+
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #00ff41;
+            color: #0a0a0a;
+            padding: 15px 25px;
+            border-radius: 2px;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .copy-notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .blink {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        .warning {
+            font-size: 11px;
+            color: #00ff4180;
+            text-align: center;
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="glitch">REEL_CIPHER</div>
+        <div class="subtitle">// CLASSIFIED ENCRYPTION PROTOCOL <span class="blink">_</span></div>
+        
+        <div class="input-group">
+            <label>INSTAGRAM REEL URL:</label>
+            <input type="text" id="urlInput" placeholder="https://www.instagram.com/reel/DP8_dRogvpe/?igsh=...">
+        </div>
+        
+        <div class="input-group">
+            <label>ENCRYPTION KEY:</label>
+            <input type="text" id="keyInput" placeholder="Enter your secret key">
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button onclick="encryptUrl()" style="flex: 1;">ENCRYPT</button>
+            <button onclick="decryptUrl()" style="flex: 1; background: #0a0a0a; color: #00ff41; border: 2px solid #00ff41;">DECRYPT</button>
+        </div>
+        
+        <div class="output-section" id="outputSection">
+            <label id="outputLabel">ENCRYPTED URL:</label>
+            <div class="output-box" id="outputBox"></div>
+        </div>
+
+        <div class="warning">
+            ⚠ KEEP YOUR ENCRYPTION KEY SECURE ⚠
+        </div>
+    </div>
+
+    <div class="copy-notification" id="copyNotif">✓ COPIED TO CLIPBOARD</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+        function encryptUrl() {
+            const url = document.getElementById('urlInput').value.trim();
+            const key = document.getElementById('keyInput').value.trim();
+            
+            if (!url || !key) {
+                alert('ERROR: Both URL and key are required');
+                return;
+            }
+            
+            if (key.length < 1) {
+                alert('ERROR: Key cannot be empty');
+                return;
+            }
+            
+            // Validate URL format
+            const reelMatch = url.match(/instagram\.com\/reel\/([^\/\?]+)/);
+            if (!reelMatch) {
+                alert('ERROR: Invalid Instagram reel URL format');
+                return;
+            }
+            
+            const reelId = reelMatch[1];
+            const baseUrl = url.substring(0, url.indexOf('/reel/') + 6);
+            const remainingPart = url.substring(url.indexOf(reelId) + reelId.length);
+            
+            // AES-128 encryption
+            const encrypted = CryptoJS.AES.encrypt(reelId, key).toString();
+            // Convert to URL-safe base64
+            const urlSafeEncrypted = encrypted.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+            
+            const encryptedUrl = baseUrl + urlSafeEncrypted + remainingPart;
+            
+            // Display output
+            const outputSection = document.getElementById('outputSection');
+            const outputBox = document.getElementById('outputBox');
+            const outputLabel = document.getElementById('outputLabel');
+            outputLabel.textContent = 'ENCRYPTED URL:';
+            outputBox.textContent = encryptedUrl;
+            outputSection.classList.add('active');
+            
+            // Auto copy to clipboard
+            copyToClipboard(encryptedUrl);
+        }
+        
+        function decryptUrl() {
+            const url = document.getElementById('urlInput').value.trim();
+            const key = document.getElementById('keyInput').value.trim();
+            
+            if (!url || !key) {
+                alert('ERROR: Both URL and key are required');
+                return;
+            }
+            
+            // Extract encrypted part
+            const reelMatch = url.match(/instagram\.com\/reel\/([^\/\?]+)/);
+            if (!reelMatch) {
+                alert('ERROR: Invalid Instagram reel URL format');
+                return;
+            }
+            
+            const encryptedId = reelMatch[1];
+            const baseUrl = url.substring(0, url.indexOf('/reel/') + 6);
+            const remainingPart = url.substring(url.indexOf(encryptedId) + encryptedId.length);
+            
+            try {
+                // Convert from URL-safe base64 back to standard base64
+                let base64 = encryptedId.replace(/-/g, '+').replace(/_/g, '/');
+                // Add padding if needed
+                while (base64.length % 4) {
+                    base64 += '=';
+                }
+                
+                // AES-128 decrypt
+                const decrypted = CryptoJS.AES.decrypt(base64, key);
+                const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
+                
+                if (!decryptedText) {
+                    throw new Error('Decryption failed');
+                }
+                
+                const decryptedUrl = baseUrl + decryptedText + remainingPart;
+                
+                // Display output
+                const outputSection = document.getElementById('outputSection');
+                const outputBox = document.getElementById('outputBox');
+                const outputLabel = document.getElementById('outputLabel');
+                outputLabel.textContent = 'DECRYPTED URL:';
+                outputBox.textContent = decryptedUrl;
+                outputSection.classList.add('active');
+                
+                // Auto copy to clipboard
+                copyToClipboard(decryptedUrl);
+            } catch (e) {
+                alert('ERROR: Decryption failed. Wrong key or invalid encrypted data.');
+            }
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const notif = document.getElementById('copyNotif');
+                notif.classList.add('show');
+                setTimeout(() => {
+                    notif.classList.remove('show');
+                }, 2000);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+            });
+        }
+
+        // Allow Enter key to trigger encryption
+        document.getElementById('keyInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                encryptUrl();
+            }
+        });
+    </script>
+</body>
+</html>
